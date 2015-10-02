@@ -20,6 +20,18 @@ GLubyte tindices[6]; // triangle vertex indices
 GLuint vboHandle; // a VBO that contains interleaved positions and colors
 GLuint indexVBO;
 
+int press_x, press_y; 
+int release_x, release_y; 
+float x_angle = 0.0; 
+float y_angle = 0.0; 
+float scale_size = 1; 
+
+int xform_mode = 0; 
+
+#define XFORM_NONE    0 
+#define XFORM_ROTATE  1
+#define XFORM_SCALE 2 
+
 void InitGeometry()
 {
  verts[0].LL[0] = -0.5; verts[0].LL[1] = -0.5; verts[0].LL[2] = 0; verts[0].LL[3] = 1;
@@ -58,28 +70,93 @@ void InitVBO()
 
 void display()
 {
- glClearColor(0,0,0,1);
- glClear(GL_COLOR_BUFFER_BIT);
- glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
- glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVBO);
- glEnableClientState(GL_VERTEX_ARRAY); // enable the vertex array on the client side
- glEnableClientState(GL_COLOR_ARRAY); // enable the color array on the client side
-// number of coordinates per vertex (4 here), type of the coordinates,
-// stride between consecutive vertices, and pointers to the first coordinate
- glColorPointer(4, GL_FLOAT, sizeof(Vertex), (char*) NULL+ sizeof(float)*4);
- glVertexPointer(4,GL_FLOAT, sizeof(Vertex), (char*) NULL+ 0);
- glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (char*) NULL+0);
- glDisableClientState(GL_VERTEX_ARRAY); glDisableClientState(GL_COLOR_ARRAY);
- glutSwapBuffers();
+  glEnable(GL_DEPTH_TEST); 
+  glClearColor(0,0,0,1);
+  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+  glMatrixMode(GL_PROJECTION); 
+  glLoadIdentity(); 
+  gluPerspective(60, 1, .1, 100); 
+
+  glMatrixMode(GL_MODELVIEW); 
+  glLoadIdentity(); 
+  gluLookAt(0,0,5,0,0,0,0,1,0); 
+
+  glRotatef(x_angle, 0, 1,0); 
+  glRotatef(y_angle, 1,0,0); 
+  glScalef(scale_size, scale_size, scale_size); 
+  glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVBO);
+  glEnableClientState(GL_VERTEX_ARRAY); // enable the vertex array on the client side
+  glEnableClientState(GL_COLOR_ARRAY); // enable the color array on the client side
+  // number of coordinates per vertex (4 here), type of the coordinates,
+  // stride between consecutive vertices, and pointers to the first coordinate
+  glColorPointer(4, GL_FLOAT, sizeof(Vertex), (char*) NULL+ sizeof(float)*4);
+  glVertexPointer(4,GL_FLOAT, sizeof(Vertex), (char*) NULL+ 0);
+  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (char*) NULL+0);
+  glDisableClientState(GL_VERTEX_ARRAY); glDisableClientState(GL_COLOR_ARRAY);
+  glutSwapBuffers();
 } 
+
+void mymouse(int button, int state, int x, int y)
+{
+  if (state == GLUT_DOWN) {
+    press_x = x; press_y = y; 
+    if (button == GLUT_LEFT_BUTTON)
+      xform_mode = XFORM_ROTATE; 
+   else if (button == GLUT_RIGHT_BUTTON) 
+      xform_mode = XFORM_SCALE; 
+  }
+  else if (state == GLUT_UP) {
+    xform_mode = XFORM_NONE; 
+  }
+}
+
+/////////////////////////////////////////////////////////
+
+void mymotion(int x, int y)
+{
+    if (xform_mode==XFORM_ROTATE) {
+      x_angle += (x - press_x)/5.0; 
+      if (x_angle > 180) x_angle -= 360; 
+      else if (x_angle <-180) x_angle += 360; 
+      press_x = x; 
+     
+      y_angle += (y - press_y)/5.0; 
+      if (y_angle > 180) y_angle -= 360; 
+      else if (y_angle <-180) y_angle += 360; 
+      press_y = y; 
+    }
+  else if (xform_mode == XFORM_SCALE){
+      float old_size = scale_size;
+      scale_size *= (1+ (y - press_y)/60.0); 
+      if (scale_size <0) scale_size = old_size; 
+      press_y = y; 
+    }
+  glutPostRedisplay(); 
+}
+
+///////////////////////////////////////////////////////////////
+
+void mykey(unsigned char key, int x, int y)
+{
+        switch(key) {
+    case 'q': exit(1);
+      break; 
+    }
+}
+///////////////////////////////////////////////////////////////
 
 int main(int argc, char** argv) {
   InitGeometry();
   glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_RGB|GLUT_SINGLE);
+  glutInitDisplayMode(GLUT_RGB|GLUT_DOUBLE|GLUT_DEPTH);
   glutInitWindowSize(500,500);
   glutCreateWindow("Lab2");
   glutDisplayFunc(display);
+  glutMouseFunc(mymouse); 
+  glutMotionFunc(mymotion);
+  glutKeyboardFunc(mykey); 
   #ifdef __APPLE__
   #else
     glewInit(); 
