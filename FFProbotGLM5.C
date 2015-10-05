@@ -19,17 +19,16 @@ using namespace std;
 #include<glm/gtx/transform.hpp> 
 
 float vertices[] = {-0.05, -0.05, 0.0,  // first triangle
-		     0.05, -0.05, 0.0, 
-		    0.05, 0.05, 0.0, 
-		    -0.05, 0.05, 0.0, }; 
+				     0.05, -0.05, 0.0, 
+				     0.05,  0.05, 0.0, 
+				    -0.05,  0.05, 0.0, }; 
 
 GLubyte tindices[6];  
 
 GLuint vboHandle[1];   // a VBO that contains interleaved positions and colors 
 GLuint indexVBO; 
 
-float angle1=0, angle2=0;
-float angle3=0, angle4=0;
+float angle1=0, angle2=0, angle3=0, angle4=0;
 
 glm::mat4 modelM = glm::mat4(1.0f); 
 
@@ -102,39 +101,84 @@ void display()
 
   color[0] = 0; color[1] = 0; color[2] = 1;
 
-  mat_stack.push(modelM);
+  mat_stack.push(modelM); // 1
   modelM = glm::scale(modelM, glm::vec3(4.0f, 1.0f, 1.0f));   
   draw_square(modelM, color);
-  modelM = mat_stack.top();  mat_stack.pop(); 
+  modelM = mat_stack.top();  
+  // mat_stack.pop(); 
   
-  mat_stack.push(modelM);
+  // mat_stack.push(modelM);
 
   //////////////////////////////
   //    Right Arm 
   //////////////////////////////
   
   color[0] = 1; color[1] = 0; color[2] = 0; 
-  modelM = glm::translate(modelM, glm::vec3(.2f, 0.0f, 0.0f));
+  modelM = glm::translate(modelM, glm::vec3(0.2f, 0.0f, 0.0f));
   modelM = glm::rotate(modelM, angle1, glm::vec3(0.0f, 0.0f, 1.0f));
-  modelM = glm::translate(modelM, glm::vec3(0.05f, 0.0f, 0.0f));  
+  modelM = glm::translate(modelM, glm::vec3(0.05f, 0.0f, 0.0f));  // rotation center
   
-  mat_stack.push(modelM);  
+  mat_stack.push(modelM);  // 2
   modelM = glm::scale(modelM, glm::vec3(2.0f, 0.8f, 1.0f)); 
   draw_square(modelM, color);
-  modelM = mat_stack.top();  mat_stack.pop(); 
+  modelM = mat_stack.top();  
+  mat_stack.pop(); // 1
+
+
+
+
 
   color[0] = 0; color[1] = 1; color[2] = 0; 
   modelM = glm::translate(modelM, glm::vec3(0.1f, 0.0f, 0.0f));
   modelM = glm::rotate(modelM, angle2, glm::vec3(0.0f, 0.0f, 1.0f));
   modelM = glm::translate(modelM, glm::vec3(0.05f, 0.0f, 0.0f));  
-  mat_stack.push(modelM);
+  mat_stack.push(modelM); // 2
   
   modelM = glm::scale(modelM, glm::vec3(2.0f, .6f, 1.0f)); 
   draw_square(modelM, color);
-  modelM = mat_stack.top();  mat_stack.pop(); 
+  modelM = mat_stack.top();  
 
-  modelM = mat_stack.top();  mat_stack.pop();
-  mat_stack.push(modelM);
+  mat_stack.pop(); // 1
+
+
+
+  modelM = mat_stack.top();  
+  // mat_stack.pop();
+  // mat_stack.push(modelM);
+
+  //////////////////////////////
+  //    Left Arm
+  //////////////////////////////
+
+  color[0] = 1; color[1] = 0; color[2] = 0; 
+  modelM = glm::translate(modelM, glm::vec3(-0.2f, 0.0f, 0.0f));
+  modelM = glm::rotate(modelM, angle3, glm::vec3(0.0f, 0.0f, 1.0f));
+  modelM = glm::translate(modelM, glm::vec3(-0.05f, 0.0f, 0.0f));  // rotation center
+  
+  mat_stack.push(modelM);  // 2
+  modelM = glm::scale(modelM, glm::vec3(2.0f, 0.8f, 1.0f)); 
+  draw_square(modelM, color);
+  modelM = mat_stack.top();  
+  mat_stack.pop(); // 1
+
+
+
+
+
+  color[0] = 0; color[1] = 1; color[2] = 0; 
+  modelM = glm::translate(modelM, glm::vec3(-0.1f, 0.0f, 0.0f));
+  modelM = glm::rotate(modelM, angle4, glm::vec3(0.0f, 0.0f, 1.0f));
+  modelM = glm::translate(modelM, glm::vec3(-0.05f, 0.0f, 0.0f));  
+  mat_stack.push(modelM); // 2
+  
+  modelM = glm::scale(modelM, glm::vec3(2.0f, .6f, 1.0f)); 
+  draw_square(modelM, color);
+  modelM = mat_stack.top();  
+
+  mat_stack.pop(); // 1
+
+  modelM = mat_stack.top();  
+
 
   
   color[0] = 0; color[1] = 1; color[2] = 0; 
@@ -185,12 +229,10 @@ void mykey(unsigned char key, int x, int y)
 	  angle1 = angle2 = angle3 = angle4 = 0; 
 	}
 
-	if (key == '1') {
-          angle1 += 5; 
-          printf(" hello!\n"); 
-        }
-        if (key == '2') 
-          angle2 += 5;
+	if (key == '1') angle1 += 5; 
+    if (key == '2') angle2 += 5;
+    if (key == '3') angle3 += 5;
+    if (key == '4') angle4 += 5;
 
 	
 	if (key == 'p')  {
