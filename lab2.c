@@ -80,9 +80,9 @@ void display()
 
   glMatrixMode(GL_MODELVIEW); 
   glLoadIdentity(); 
-  gluLookAt(0,0,5,0,0,0,0,1,0); 
+  gluLookAt(0,0,3, 0,0,0, 0,1,0); 
 
-  glRotatef(x_angle, 0, 1,0); 
+  glRotatef(x_angle, 0, 1,0);   
   glRotatef(y_angle, 1,0,0); 
   glScalef(scale_size, scale_size, scale_size); 
   glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
