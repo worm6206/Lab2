@@ -28,7 +28,7 @@ GLubyte tindices[6];
 GLuint vboHandle[1];   // a VBO that contains interleaved positions and colors 
 GLuint indexVBO; 
 
-float angle1=0, angle2=0, angle3=0, angle4=0;
+float angle1=0, angle2=0, angle3=0, angle4=0, angle0=0;
 
 glm::mat4 modelM = glm::mat4(1.0f); 
 
@@ -100,12 +100,18 @@ void display()
   float color[3]; 
 
   color[0] = 0; color[1] = 0; color[2] = 1;
+  mat_stack.push(modelM); // 0
+  modelM = glm::rotate(modelM, angle0, glm::vec3(0.0f, 0.0f, 1.0f)); // 0+
+  
 
-  mat_stack.push(modelM); // 1
-  modelM = glm::scale(modelM, glm::vec3(4.0f, 1.0f, 1.0f));   
-  draw_square(modelM, color);
-  modelM = mat_stack.top();  
-  // mat_stack.pop(); 
+  mat_stack.push(modelM); // 0+
+
+
+  mat_stack.push(modelM); 
+  modelM = glm::scale(modelM, glm::vec3(4.0f, 3.0f, 1.0f));   
+  draw_square(modelM, color); 
+  modelM = mat_stack.top();
+  mat_stack.pop();
   
   // mat_stack.push(modelM);
 
@@ -114,15 +120,16 @@ void display()
   //////////////////////////////
   
   color[0] = 1; color[1] = 0; color[2] = 0; 
+  // 0 in stack, 1 in modelM
   modelM = glm::translate(modelM, glm::vec3(0.2f, 0.0f, 0.0f));
   modelM = glm::rotate(modelM, angle1, glm::vec3(0.0f, 0.0f, 1.0f));
   modelM = glm::translate(modelM, glm::vec3(0.05f, 0.0f, 0.0f));  // rotation center
   
-  mat_stack.push(modelM);  // 2
-  modelM = glm::scale(modelM, glm::vec3(2.0f, 0.8f, 1.0f)); 
+  mat_stack.push(modelM);  // 1*, stack is now 0|1*
+  modelM = glm::scale(modelM, glm::vec3(2.0f, 2.0f, 1.0f)); 
   draw_square(modelM, color);
   modelM = mat_stack.top();  
-  mat_stack.pop(); // 1
+  mat_stack.pop(); 
 
 
 
@@ -132,18 +139,17 @@ void display()
   modelM = glm::translate(modelM, glm::vec3(0.1f, 0.0f, 0.0f));
   modelM = glm::rotate(modelM, angle2, glm::vec3(0.0f, 0.0f, 1.0f));
   modelM = glm::translate(modelM, glm::vec3(0.05f, 0.0f, 0.0f));  
-  mat_stack.push(modelM); // 2
-  
+
+  mat_stack.push(modelM); 
   modelM = glm::scale(modelM, glm::vec3(2.0f, .6f, 1.0f)); 
-  draw_square(modelM, color);
+  draw_square(modelM, color); 
   modelM = mat_stack.top();  
-
-  mat_stack.pop(); // 1
+  mat_stack.pop();
 
 
 
   modelM = mat_stack.top();  
-  // mat_stack.pop();
+  mat_stack.pop();
   // mat_stack.push(modelM);
 
   //////////////////////////////
@@ -155,11 +161,11 @@ void display()
   modelM = glm::rotate(modelM, angle3, glm::vec3(0.0f, 0.0f, 1.0f));
   modelM = glm::translate(modelM, glm::vec3(-0.05f, 0.0f, 0.0f));  // rotation center
   
-  mat_stack.push(modelM);  // 2
-  modelM = glm::scale(modelM, glm::vec3(2.0f, 0.8f, 1.0f)); 
+  mat_stack.push(modelM);  
+  modelM = glm::scale(modelM, glm::vec3(2.0f, 2.0f, 1.0f)); 
   draw_square(modelM, color);
   modelM = mat_stack.top();  
-  mat_stack.pop(); // 1
+  mat_stack.pop(); 
 
 
 
@@ -169,15 +175,16 @@ void display()
   modelM = glm::translate(modelM, glm::vec3(-0.1f, 0.0f, 0.0f));
   modelM = glm::rotate(modelM, angle4, glm::vec3(0.0f, 0.0f, 1.0f));
   modelM = glm::translate(modelM, glm::vec3(-0.05f, 0.0f, 0.0f));  
-  mat_stack.push(modelM); // 2
-  
+
+
+  mat_stack.push(modelM); 
   modelM = glm::scale(modelM, glm::vec3(2.0f, .6f, 1.0f)); 
   draw_square(modelM, color);
   modelM = mat_stack.top();  
-
-  mat_stack.pop(); // 1
+  mat_stack.pop(); 
 
   modelM = mat_stack.top();  
+  mat_stack.pop();
 
 
   
@@ -226,13 +233,14 @@ void mykey(unsigned char key, int x, int y)
 	//modelM =  translate(modelM, 0,-.1,0);
 	if (key == 'c') {
 	  modelM =  glm::mat4(1.0f);
-	  angle1 = angle2 = angle3 = angle4 = 0; 
+	  angle1 = angle2 = angle3 = angle4 = angle0 = 0; 
 	}
 
-	if (key == '1') angle1 += 5; 
-    if (key == '2') angle2 += 5;
-    if (key == '3') angle3 += 5;
-    if (key == '4') angle4 += 5;
+	if (key == '1') angle1 += 1; 
+    if (key == '2') angle2 += 1;
+    if (key == '3') angle3 += 1;
+    if (key == '4') angle4 += 1;
+    if (key == '0') angle0 += 1;
 
 	
 	if (key == 'p')  {
